@@ -36,7 +36,7 @@ class Explode extends ParticleAnimation {
   color targetColor;
   
   Explode(Particle p) {
-    super(p, random(40, 100));
+    super(p, random(100, 800));
     targetLength = random(10, 20);
     targetColor = randomColor();
   }
@@ -73,45 +73,44 @@ class Trail extends ParticleAnimation {
   float alpha;
   color c;
   PVector[] trail;
-  int current;
+  int trailSize = 100;
+  int head = 0;
+  int count = 0;
+  float minSpeed = 0.5;
   
   Trail(Particle p) {
-    super(p, random(50, 200));
+    super(p, random(200, 4000));
     alpha = random(200, 255);
     c = randomColor();
-    trail = new PVector[50];
-    current = 0;
+    trail = new PVector[trailSize];
+    head = 0;
+    count = 0;
   }
   
   void animate() {
     addTrail();
     alpha = map(time, 0, duration, alpha, 0);
-    
-    for (int i=0; i<current; i++) {
-      PVector pos = trail[i];
-      fill(c, alpha);
-      noStroke();
-      circle(pos.x, pos.y, map(i, 0, current, 1, p.r));
+    for (int i = 0; i < count; i++) {
+      int idx = (head - 1 - i + trailSize) % trailSize;
+      PVector pos = trail[idx];
+      // Only draw if visible and on screen
+      if (pos != null && alpha > 0 && p.r > 0 && pos.x + p.r > 0 && pos.x - p.r < width && pos.y + p.r > 0 && pos.y - p.r < height) {
+        fill(c, alpha);
+        noStroke();
+        circle(pos.x, pos.y, map(i, 0, count, p.r, 1));
+      }
     }
-    
     time++;
   }
   
   void addTrail() {
-    if (current < trail.length) {
-      trail[current] = p.pos.copy();
-      current++;
-    }
-    else {
-      for (int i=trail.length-1; i>0; i--) {
-        trail[i] = trail[i-1];
-      }
-      trail[0] = p.pos.copy();
-    }
+    trail[head] = p.pos.copy();
+    head = (head + 1) % trailSize;
+    if (count < trailSize) count++;
   }
   
   boolean isDone() {
-    return time >= duration || p.vel.mag() < 0.7; 
+    return time >= duration || p.vel.mag() < minSpeed; 
   }
   
   color randomColor() {

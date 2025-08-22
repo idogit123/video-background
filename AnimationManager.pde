@@ -1,15 +1,17 @@
 class AnimationManager {
-  ArrayList<ParticleAnimation> animations; 
-  Particle p;
-  float expldeChance = 0.00005, trailChance = 0.0005;
+  ArrayList<ParticleAnimation> animations;
   
-  AnimationManager(Particle p) {
-    this.p = p;
+  AnimationManager() {
     animations = new ArrayList<ParticleAnimation>();
-    add(new FadeIn(p));
   }
   
   void add(ParticleAnimation a) {
+    // Prevent duplicate animation types for the same particle
+    for (ParticleAnimation existing : animations) {
+      if (existing.getClass() == a.getClass() && existing.p == a.p) {
+        return;
+      }
+    }
     animations.add(a);
   }
   
@@ -22,10 +24,5 @@ class AnimationManager {
         i--;
       }
     }
-    
-    if (random(1) < expldeChance)
-      add(new Explode(p));
-    if (p.vel.mag() > 0.788)
-      add(new Trail(p));
   }
 }

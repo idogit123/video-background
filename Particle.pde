@@ -1,15 +1,13 @@
 class Particle {
-  AnimationManager am;
   PVector pos, vel, acc;
   float r;
   float speed, minSpeed = 0.05, maxSpeed = 0.8;
-  float noiseOffset = 0, noiseStep = 0.01, noiseForceMultiplyer = 0.007;
+  float noiseOffset = 0, noiseStep = 0.01, noiseForceMultiplyer = 0.012;
   float forceFeildStep = 0.01, forceFeildMultiplyer = 0.01;
   color c;
   float a;
-  
+
   Particle() {
-    am = new AnimationManager(this);
     acc = new PVector();
     vel = new PVector();
     pos = new PVector(
@@ -24,8 +22,9 @@ class Particle {
   }
   
   void update() {
-    acc = forceFeild();
-    acc.add(noiseForce());
+    PVector ff = forceFeild();
+    PVector nf = noiseForce();
+    acc.set(ff.x + nf.x, ff.y + nf.y);
     vel.add(acc);
     vel.limit(speed);
     pos.add(vel);
@@ -34,11 +33,12 @@ class Particle {
   }
   
   void show() {
-    am.manage();
-    
-    fill(c, a);
-    noStroke();
-    circle(pos.x, pos.y, r);
+    // Only draw if visible and on screen
+    if (a > 0 && r > 0 && !isOutOfBounds()) {
+      fill(c, a);
+      noStroke();
+      circle(pos.x, pos.y, r);
+    }
   }
   
   boolean isOutOfBounds() {
@@ -81,5 +81,16 @@ class Particle {
         random(200, 255)
       );
     }
+  }
+
+  void reset() {
+    pos.set(random(0, width), random(0, height));
+    vel.set(0, 0);
+    acc.set(0, 0);
+    noiseOffset = random(1, 1000);
+    r = 0;
+    speed = random(minSpeed, maxSpeed);
+    c = randomColor();
+    a = 0;
   }
 }
