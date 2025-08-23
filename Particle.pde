@@ -2,8 +2,8 @@ class Particle {
   PVector pos, vel, acc;
   float r;
   float speed, minSpeed = 0.05, maxSpeed = 0.8;
-  float noiseOffset = 0, noiseStep = 0.01, noiseForceMultiplyer = 0.012;
-  float forceFeildStep = 0.01, forceFeildMultiplyer = 0.01;
+  float noiseOffset = 0, noiseStep = 0.01, noiseForceMultiplyer = 0.015;
+  float forceFeildMultiplyer = 0.01;
   color c;
   float a;
 
@@ -60,18 +60,7 @@ class Particle {
   }
   
   PVector forceFeild() {
-    // PVector feildPos = PVector.mult(pos, forceFeildStep);
-    // float angle = noise(feildPos.x, feildPos.y) * TWO_PI * 2;
-    // Use image brightness as force field
-    int x = int(pos.x);
-    int y = int(pos.y);
-    float brightness = 0.5;
-    if (x >= 0 && x < fieldImg.width && y >= 0 && y < fieldImg.height) {
-      color c = fieldImg.get(x, y);
-      brightness = brightness(c) / 255.0;
-    }
-    float angle = brightness * TWO_PI * 2;
-    return PVector.fromAngle(angle).mult(forceFeildMultiplyer);
+    return ffp.getForce(pos).mult(forceFeildMultiplyer);
   }
   
   color randomColor() {
