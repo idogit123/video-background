@@ -34,9 +34,10 @@ class FadeIn extends ParticleAnimation {
 class Explode extends ParticleAnimation {
   float targetLength;
   color targetColor;
+  float growDuration = 0.95;
   
   Explode(Particle p) {
-    super(p, random(100, 800));
+    super(p, random(100, 500));
     targetLength = random(10, 20);
     targetColor = randomColor();
   }
@@ -44,7 +45,11 @@ class Explode extends ParticleAnimation {
   void animate() {
     strokeWeight(2);
     stroke(targetColor);
-    float currentLength = map(time, 0, duration, 0, targetLength);
+    float currentLength;
+    if (time < duration * growDuration)
+      currentLength = map(time, 0, duration * growDuration, 0, targetLength);
+    else
+      currentLength = map(time, duration * growDuration, duration , targetLength, 0);
     line(p.pos.x, p.pos.y, p.pos.x, p.pos.y + currentLength);
     line(p.pos.x, p.pos.y, p.pos.x, p.pos.y - currentLength);
     line(p.pos.x, p.pos.y, p.pos.x + currentLength, p.pos.y);

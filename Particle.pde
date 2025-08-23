@@ -2,8 +2,9 @@ class Particle {
   PVector pos, vel, acc;
   float r;
   float speed, minSpeed = 0.05, maxSpeed = 0.8;
-  float noiseOffset = 0, noiseStep = 0.01, noiseForceMultiplyer = 0.015;
-  float forceFeildMultiplyer = 0.01;
+  float noiseOffset = 0, noiseStep = 0.01, noiseForceMultiplier = 0.015;
+  float forceFieldMultiplier = 0.01;
+  float mouseForceRadius = 80, mouseForceMultiplier = 1.5;
   color c;
   float a;
 
@@ -22,11 +23,17 @@ class Particle {
   }
   
   void update() {
-    PVector ff = forceFeild();
+    PVector ff = forceField();
     PVector nf = noiseForce();
-    acc.set(ff.x + nf.x, ff.y + nf.y);
+    PVector mouseForce = mouseForce();
+    acc.set(ff.x + nf.x + mouseForce.x, ff.y + nf.y + mouseForce.y);
     vel.add(acc);
-    vel.limit(speed);
+    if (mousePressed && mouseForce.mag() > 0) {
+      vel.limit(maxSpeed * 2);
+    }
+    else {
+      vel.limit(speed);
+    }
     pos.add(vel);
     
     noiseOffset += noiseStep;
@@ -35,8 +42,10 @@ class Particle {
   void show() {
     // Only draw if visible and on screen
     if (a > 0 && r > 0 && !isOutOfBounds()) {
-      fill(c, a);
       noStroke();
+      fill(c, 7);
+      circle(pos.x, pos.y, r * 5);
+      fill(c, a);
       circle(pos.x, pos.y, r);
     }
   }
@@ -56,11 +65,25 @@ class Particle {
   
   PVector noiseForce() {
     float angle = noise(noiseOffset) * TWO_PI * 2;
-    return PVector.fromAngle(angle).mult(noiseForceMultiplyer);
+    return PVector.fromAngle(angle).mult(noiseForceMultiplier);
   }
-  
-  PVector forceFeild() {
-    return ffp.getForce(pos).mult(forceFeildMultiplyer);
+
+  PVector forceField() {
+    return ffp.getForce(pos).mult(forceFieldMultiplier);
+  }
+
+  PVector mouseForce() {
+    if (mousePressed) {
+        float mouseDist = dist(pos.x, pos.y, mouseX, mouseY);
+
+        if (mouseDist < mouseForceRadius) {
+            PVector away = PVector.sub(pos, new PVector(mouseX, mouseY));
+            away.normalize();
+            away.mult(mouseForceMultiplier * (mouseForceRadius - mouseDist) / mouseForceRadius);
+            return away;
+        }
+    }
+    return new PVector(0, 0);
   }
   
   color randomColor() {

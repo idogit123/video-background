@@ -10,7 +10,7 @@ void setup() {
   frameRate(30);
   //fieldImg = loadImage("space2.png");
   //fieldImg.resize(width, height);
-  pm = new ParticleManager(5000);
+  pm = new ParticleManager(3000);
   ffp = new NoiseForceField(0.01, 0.001, color(120, 250, 35), bgColor);
 }
 
