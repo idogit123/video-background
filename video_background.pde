@@ -6,13 +6,14 @@ color bgColor = color(2, 5, 13);
 void setup() {
   fullScreen();
   background(bgColor);
-  frameRate(60);
-  fieldImg = loadImage("apple.jpeg");
-  pm = new ParticleManager(3000);
+  frameRate(30);
+  fieldImg = loadImage("space2.png");
+  fieldImg.resize(width, height);
+  pm = new ParticleManager(5000);
 }
 
 void draw() {
-  background(bgColor);
+  set(0, 0, fieldImg);
   
   pm.manage();
 }

@@ -76,7 +76,7 @@ class Trail extends ParticleAnimation {
   int trailSize = 100;
   int head = 0;
   int count = 0;
-  float minSpeed = 0.5;
+  float minSpeed = 0.7;
   
   Trail(Particle p) {
     super(p, random(200, 4000));
@@ -100,6 +100,8 @@ class Trail extends ParticleAnimation {
         circle(pos.x, pos.y, map(i, 0, count, p.r, 1));
       }
     }
+    if (p.vel.mag() < minSpeed)
+      duration *= 0.5;
     time++;
   }
   
@@ -110,7 +112,7 @@ class Trail extends ParticleAnimation {
   }
   
   boolean isDone() {
-    return time >= duration || p.vel.mag() < minSpeed; 
+    return time >= duration; 
   }
   
   color randomColor() {
